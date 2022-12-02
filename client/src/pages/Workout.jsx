@@ -21,6 +21,7 @@ import Layout from "../components/Layout";
 function Workout() {
   const [specificset, setSpecificset] = useState("list");
   const [specificpic, setSpecificpic] = useState(null);
+  const [specificname, setSpecificname] = useState("list");
   const [stopped, setStopped] = useState(false);
   const [isrestmodalon, setIsrestmodalon] = useState([false, 0]);
   const [workoutdone, setWorkoutdone] = useState(false);
@@ -28,12 +29,11 @@ function Workout() {
   const [workoutdata, setWorkoutdata] = useRecoilState(workoutlistState);
   const token = useRecoilValue(TokenState);
   const navigate = useNavigate();
-  const URL = process.env.REACT_APP_URL;
+  const URL = process.env.REACT_APP_BASE_URL;
 
   async function getdata(today) {
-    console.log(URL);
     await axios
-      .get(URL + `exercises/progress?date=${today}`, {
+      .get(URL + `/exercises/progress?date=${today}`, {
         // test용
         // .get(URL + "exercises/progress?date=2022-11-05", {
         headers: {
@@ -45,6 +45,7 @@ function Workout() {
         setWorkoutdata(data.data.data);
         setWorktime(data.data.data.totalTime);
         setSpecificpic(data.data.data.exercises[0].imageUrl);
+        setSpecificname(data.data.data.exercises[0].exerciseName);
       })
       .catch((data) => {
         if (data.response.status === 421) alert("계획된 운동이 없습니다");
@@ -167,7 +168,7 @@ function Workout() {
 
     await axios
       .patch(
-        URL + `exercises/progress/${workoutdata.todayId}`,
+        URL + `/exercises/progress/${workoutdata.todayId}`,
         {
           totalTime: worktime,
           exercises: workoutdata.exercises,
@@ -180,7 +181,7 @@ function Workout() {
       )
       .then(
         axios.patch(
-          URL + "users/mypages/info",
+          URL + "/users/mypages/info",
           {
             Weight: weight,
           },
@@ -219,10 +220,11 @@ function Workout() {
         {workoutdata.exercises ? (
           <>
             <div className="relative flex justify-between items-center border-transparent h-[3em] px-[1em] py-[0.1em] xs:py-[0.5em] text-[1.5em] font-bold text-white">
-              <span className="flex basis-1/2 px-[1em] xs:px-[1.2em] pt-[0.3em] xs:pt-[0.4em] xs:text-[1.5rem] whitespace-nowrap overflow-x-clip overflow-y-visible text-left">
-                {specificset === "list"
+              <span className="flex w-[17rem] px-[1em] xs:px-[1.2em] pt-[0.3em] xs:pt-[0.4em] xs:text-[1.5rem] break-keep overflow-x-clip text-left">
+                {/* <span className="flex basis-1/2 px-[1em] xs:px-[1.2em] pt-[0.3em] xs:pt-[0.4em] xs:text-[1.5rem] whitespace-nowrap overflow-x-clip overflow-y-visible text-left"> */}
+                {specificname === "list"
                   ? workoutdata.exercises[0].exerciseName
-                  : workoutdata.exercises[specificset].exerciseName}
+                  : specificname}
               </span>
               <button
                 type="button"
@@ -261,6 +263,7 @@ function Workout() {
                       setState={setSpecificset}
                       hoverchangepic={x.imageUrl}
                       setpic={setSpecificpic}
+                      setNamestate={setSpecificname}
                     />
                   ))
                 : workoutdata.exercises[specificset].eachRecords.map(
