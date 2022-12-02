@@ -9,13 +9,14 @@ import PlanAdd from "../components/Plan/PlanAdd";
 import PlanCalendar from "../components/Plan/PlanCalendar";
 import PlanList from "../components/Plan/PlanList";
 import RandomMessage from "../components/Plan/RandomMessage";
-import { isModal, ModalNum, selectedDays, TokenValue } from "../state/states";
+import { isModal, ModalNum, selectedDays } from "../state/states";
+import { TokenState } from "../state/UserState";
 
 const Plan = () => {
   const [isModalOpen, setIsModalOpen] = useRecoilState(isModal);
   const [categories, setCategories] = useState(null);
   const [Modals, setModals] = useRecoilState(ModalNum);
-  const [token, setToken] = useRecoilState(TokenValue);
+  const [token, setToken] = useRecoilState(TokenState);
   const [selectedDay, setSelectedDay] = useRecoilState(selectedDays);
   const [data, setData] = useState(undefined);
   const [editData, setEditData] = useState(undefined);
@@ -31,7 +32,7 @@ const Plan = () => {
     await axios
       .delete(URL + `/exercises/records/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
         },
       })
       .then((res) => {
@@ -46,7 +47,7 @@ const Plan = () => {
     await axios
       .get(URL + `/exercises/records/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
         },
       })
       .then((res) => {
@@ -58,15 +59,17 @@ const Plan = () => {
   };
 
   useEffect(() => {
+    setData(undefined);
+
     axios
       .get(URL + `/exercises/records?date=${dayFormat}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
         },
       })
       .then((res) => {
-        if (res.data?.data?.length === 0) {
-          setData(undefined);
+        if (res.data?.data?.length === 0 || !res.data?.data) {
+          setData([]);
         } else {
           setData(res.data.data);
         }
@@ -106,14 +109,20 @@ const Plan = () => {
           />
         </div>
         <div className="flex justify-center">
-          {data ? (
+          {data === undefined && (
+            <div className="flex flex-col items-center justify-center mt-[16em]">
+              <Loading />
+            </div>
+          )}
+          {Boolean(data && data.length) && (
             <PlanList
               data={data}
               setData={setData}
               deletePlan={deletePlan}
               handleEdit={handleEdit}
             />
-          ) : (
+          )}
+          {Boolean(data && !data.length) && (
             <div className="flex flex-col items-center justify-center mt-[12em]">
               <Loading />
               <div className="text-[#cccccc] font-semibold text-[1.7em] rounded-lg mt-[2em]">

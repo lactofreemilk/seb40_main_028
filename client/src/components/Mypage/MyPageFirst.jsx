@@ -7,6 +7,7 @@ import styled from 'styled-components/macro';
 import MyPageText from './MyPageText';
 import { LoginState, TokenState } from "../../state/UserState";
 import { useRecoilValue } from "recoil";
+import Logout from "../../pages/Logout";
 
 const MyPageForm = styled.form`
   display: flex;
@@ -44,30 +45,36 @@ justify-content: center;
 font-size: 1.2em;
 width: 25rem;
 font-weight: 400;
+margin-bottom: 3em;
+`;
+const PageText2 = styled.div`
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 0.2em;
+margin-bottom:-23.5em;
+margin-left: -51em;
+width: 25rem;
+font-weight: 400;
 `;
 
-
-
-
-// function minMaxData() {
-//   ajaxCall(
-//       "GET",
-//       "url",
-//       null,
-//       function (data) {
-//           for (let i = 0; i < 6; i++) {
-//              set.push(set.data);
-//               KgData.push(KgData.data);
-//               Gym.push(Gym.data);
-
-//           }
-//       },
-//       null,
-//       null
-//   );
-// }
-
-
+const MyPageButton2 = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 15px;
+  padding: 15px;
+  font-size: 14px;
+  margin-left: 278px;
+  margin-bottom: -3.1em;
+  :hover {
+    background-color: #4c53bf;
+  }
+  background-color: #747bf2;
+  border-radius: 4px;
+  cursor: pointer;
+`;
 
 const MyPageFirst = () => {
   const [KgData, setKgData] = useState('');
@@ -77,7 +84,8 @@ const MyPageFirst = () => {
   // 토큰
   const token = useRecoilValue(TokenState);
   // url주소
-  const url = "http://13.209.190.35:8080";
+  const URL = process.env.REACT_APP_BASE_URL;
+
   if (login === false) {
     alert("로그인이 안 되어 있습니다.");
     navigate("/login");
@@ -86,10 +94,11 @@ const MyPageFirst = () => {
   useEffect(()=>{
 
     axios
-    .get(`${url}/users/mypages`,
+    .get(`${URL}/users/mypages`,
     { headers: {Authorization: `${token}`,}, 
    })
     .then((res => {
+      console.log(res.data)
       let a = []
       for(let i = 0; i<6; i++){
       if(res.data.data.monthlyWeights[i]){
@@ -108,8 +117,8 @@ const MyPageFirst = () => {
 
       let c = []
       for(let i = 0; i<6; i++){
-      if(res.data.data.monthlyRecords[i]){
-      c.push(res.data.data.monthlyRecords[i].date);
+      if(res.data.data.monthlyWeights[i]){
+      c.push(res.data.data.monthlyWeights[i].date);
       }  
     }
       setMonth(c)
@@ -120,6 +129,7 @@ const MyPageFirst = () => {
     const Kg = KgData;
     const GymCheck = GymData;
     const GymMonth = month
+    const [isOpen, setIsOpen] = useState(false);
 
 Chart.register();
 const data = {
@@ -127,7 +137,7 @@ const data = {
   labels: GymMonth,
   datasets: [
     {
-      label: "몸무게",
+      label: "월 평균 체중",
       data: Kg,
       fill: true,
       borderColor: ['rgba(151, 164, 255, 0.3)'],
@@ -155,45 +165,19 @@ const options = {
       },
     },
   },
-};
-
- 
-
-
-  // .then((response) => response.json())
-  // .then((data) => console.log(data));
-
-  // axios.
-  // get("http://13.209.190.35:8080/users/mypages"),
-  // {
-  //   headers: {
-  //     Authorization: `${localStorage.getItem('login-token')}`,
-  // }
-  // .then((res) => {
-  //   console.log(res)
-    
-  //   })
-  //   .catch((err)=>{
-  //     console.log(err);
-  //   })
-  // };
-
-  // const chart = res.data;
-  //   chart.forEach(data=> {
-  //     for (let i = 0; i < 6; i++){
-  //     Month.push(monthlyRecords.date);
-  //     KgData.push(monthlyWeights.weight);
-  //     GymCheck.push(monthlyRecords.record);
-  //     console.log(data)
-  //     }
-      
-  //     });
-  //     setGymCheck(GymCheck)
-  //     setKgData(KgData)
+}
 
   return (
     <MyPageForm>
-      <PageText>나만의 운동 일지</PageText>
+      <MyPageButton2
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="modalButton"
+          >Logout
+          </MyPageButton2>
+          <Logout open={isOpen} onClose={() => setIsOpen(false)} />
+      <PageText className="matext">나만의 운동 일지</PageText>
+      <PageText2 className="hitext">Touch</PageText2>
         <Container>
         <Line data={data} options={options}/>
         </Container>

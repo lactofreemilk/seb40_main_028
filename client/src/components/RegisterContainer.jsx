@@ -109,7 +109,8 @@ export default function RegisterContainer() {
 
   const navigate = useNavigate();
 
-  const url = "http://13.209.190.35:8080";
+  // const url = "http://13.209.190.35:8080";
+  const url = "https://guenlog.shop";
 
   const {
     register,
@@ -125,7 +126,7 @@ export default function RegisterContainer() {
   // console.log(watch("email"));
 
   const onRegister = async (data) => {
-    console.log("data", data);
+    // console.log("data", data);
     // console.log("이메일", data.email)
     // console.log("닉네임", data.nickname)
     // console.log("패스워드", data.password)
@@ -156,12 +157,12 @@ export default function RegisterContainer() {
         navigate("/login");
 
         // console.log(res);
-        console.log("회원가입 성공 로그인 ~~~~~~~~~~~~~~~~");
+        // console.log("회원가입 성공 로그인 ~~~~~~~~~~~~~~~~");
         // console.log("응답 전체",res)
       }
     } catch (err) {
       // 응답 실패
-      console.log(err);
+      // console.log(err);
 
       // 에러 상세 메세지
       // console.log(err.response.data.message)

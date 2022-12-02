@@ -17,7 +17,7 @@ import {
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { TokenValue } from "../../state/states";
+import { TokenState } from "../../state/UserState";
 import CalendarContent from "./CalendarContent";
 
 const MainCalendar = () => {
@@ -42,7 +42,7 @@ const MainCalendar = () => {
   const [todos, setTodos] = useState([]);
   const [boolean, setBoolean] = useState(false);
   const [meetings, setMeetings] = useState([]);
-  const [token, setToken] = useRecoilState(TokenValue);
+  const [token, setToken] = useRecoilState(TokenState);
   const firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
   const days = eachDayOfInterval({
     start: firstDayCurrentMonth,
@@ -73,7 +73,7 @@ const MainCalendar = () => {
     await axios
       .get(URL + `/exercises/calendar?date=${month}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
         },
       })
       .then((res) => {
@@ -92,7 +92,7 @@ const MainCalendar = () => {
       await axios
         .get(URL + `/exercises/calendar/detail/${todayId}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: token,
           },
         })
         .then((res) => {
@@ -109,7 +109,7 @@ const MainCalendar = () => {
 
   useEffect(() => {
     onDateClick(selectedDay);
-  });
+  }, [selectedDay]);
 
   return (
     <div className="mt-9 min-w-[20em] max-w-[20em]">
@@ -189,16 +189,46 @@ const MainCalendar = () => {
                     {format(day, "d")}
                   </time>
                 </button>
+
                 <div className="w-1 h-1 mx-auto mt-1">
+                  {meetings.map((meeting, idx) => {
+                    if (
+                      isSameDay(parseISO(meeting.dueDate), day) &&
+                      meeting.completed === 0
+                    ) {
+                      return (
+                        <div
+                          key={idx}
+                          className="w-1 h-1 rounded-full bg-red-500 mt-1"
+                        />
+                      );
+                    } else if (
+                      isSameDay(parseISO(meeting.dueDate), day) &&
+                      meeting.completed === 1
+                    ) {
+                      return (
+                        <div
+                          key={idx}
+                          className="w-1 h-1 rounded-full bg-green-500 mt-1"
+                        />
+                      );
+                    }
+                  })}
+
+                  {/* {meetings.some(
+                    (meeting) =>
+                      isSameDay(parseISO(meeting.dueDate), day) &&
+                      meeting.completed >= 1
+                  ) && <div className="w-1 h-1 rounded-full bg-green-500" />}
+
                   {meetings.some((meeting) =>
                     isSameDay(parseISO(meeting.dueDate), day)
-                  ) && <div className="w-1 h-1 rounded-full bg-sky-500" />}
+                  ) && <div className="w-1 h-1 rounded-full bg-red-400" />} */}
                 </div>
               </div>
             ))}
           </div>
         </div>
-
         <section className="mt-4 px-12 ">
           <h2 className="font-semibold text-white">
             이날의 운동{" "}
