@@ -1,4 +1,4 @@
-package com.seb028;
+package com.seb028.guenlog;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -6,8 +6,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class GuenLogApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
 
 }
